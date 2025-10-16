@@ -23,7 +23,6 @@
     window.addEventListener(
       eventType,
       function (e) {
-        console.log(`%c🚫 拦截了 window.${eventType}`, "color: red;");
         e.stopImmediatePropagation();
         e.preventDefault();
       },
@@ -33,7 +32,6 @@
     document.addEventListener(
       eventType,
       function (e) {
-        console.log(`%c🚫 拦截了 document.${eventType}`, "color: red;");
         e.stopImmediatePropagation();
         e.preventDefault();
       },
