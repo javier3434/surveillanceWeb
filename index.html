@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>访问者信息监测系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .info-card {
+            transition: transform 0.2s;
+        }
+        .info-card:hover {
+            transform: translateY(-2px);
+        }
+        .loading {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">🌐 访问者信息监测系统</h1>
+            <p class="text-gray-600">实时显示您的设备、网络和浏览器信息</p>
+        </header>
+
+        <div class="max-w-6xl mx-auto">
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="info-card bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-semibold text-blue-600 mb-4 flex items-center">
+                        <span class="mr-2">🌍</span> IP信息
+                    </h2>
+                    <div class="space-y-3">
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">IP地址:</span>
+                            <span id="ip-address" class="text-gray-800 font-mono loading">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">ISP提供商:</span>
+                            <span id="isp" class="text-gray-800 loading">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">国家/地区:</span>
+                            <span id="country" class="text-gray-800 loading">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">省份:</span>
+                            <span id="region" class="text-gray-800 loading">加载中...</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600 font-medium">城市:</span>
+                            <span id="city" class="text-gray-800 loading">加载中...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-semibold text-green-600 mb-4 flex items-center">
+                        <span class="mr-2">📍</span> 地理位置
+                    </h2>
+                    <div class="space-y-3">
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">纬度:</span>
+                            <span id="latitude" class="text-gray-800 font-mono loading">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">经度:</span>
+                            <span id="longitude" class="text-gray-800 font-mono loading">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">时区:</span>
+                            <span id="timezone" class="text-gray-800 loading">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">邮政编码:</span>
+                            <span id="postal" class="text-gray-800 loading">加载中...</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600 font-medium">GPS精度:</span>
+                            <span id="accuracy" class="text-gray-800 loading">等待授权...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-semibold text-purple-600 mb-4 flex items-center">
+                        <span class="mr-2">💻</span> 设备信息
+                    </h2>
+                    <div class="space-y-3">
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">设备类型:</span>
+                            <span id="device-type" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">操作系统:</span>
+                            <span id="os" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">系统版本:</span>
+                            <span id="os-version" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">屏幕分辨率:</span>
+                            <span id="screen-resolution" class="text-gray-800 font-mono">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">颜色深度:</span>
+                            <span id="color-depth" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600 font-medium">像素比:</span>
+                            <span id="pixel-ratio" class="text-gray-800">加载中...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-semibold text-orange-600 mb-4 flex items-center">
+                        <span class="mr-2">🌐</span> 浏览器信息
+                    </h2>
+                    <div class="space-y-3">
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">浏览器:</span>
+                            <span id="browser-name" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">版本:</span>
+                            <span id="browser-version" class="text-gray-800 font-mono">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">渲染引擎:</span>
+                            <span id="browser-engine" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">语言:</span>
+                            <span id="language" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">Cookies:</span>
+                            <span id="cookies-enabled" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600 font-medium">在线状态:</span>
+                            <span id="online-status" class="text-gray-800">加载中...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-semibold text-red-600 mb-4 flex items-center">
+                        <span class="mr-2">📡</span> 网络信息
+                    </h2>
+                    <div class="space-y-3">
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">连接类型:</span>
+                            <span id="connection-type" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">有效类型:</span>
+                            <span id="effective-type" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">下行速度:</span>
+                            <span id="downlink" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">往返时延(RTT):</span>
+                            <span id="rtt" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600 font-medium">省流模式:</span>
+                            <span id="save-data" class="text-gray-800">加载中...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-semibold text-pink-600 mb-4 flex items-center">
+                        <span class="mr-2">🔋</span> 电池信息
+                    </h2>
+                    <div class="space-y-3">
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">电量:</span>
+                            <span id="battery-level" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">充电状态:</span>
+                            <span id="battery-charging" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">充电时间:</span>
+                            <span id="charging-time" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600 font-medium">放电时间:</span>
+                            <span id="discharging-time" class="text-gray-800">加载中...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-card bg-white p-6 rounded-xl shadow-lg mt-6">
+                <h2 class="text-2xl font-semibold text-indigo-600 mb-4 flex items-center">
+                    <span class="mr-2">ℹ️</span> 其他信息
+                </h2>
+                <div class="space-y-3">
+                    <div class="flex justify-between border-b pb-2">
+                        <span class="text-gray-600 font-medium">当前时间:</span>
+                        <span id="current-time" class="text-gray-800">加载中...</span>
+                    </div>
+                    <div class="flex justify-between border-b pb-2">
+                        <span class="text-gray-600 font-medium">访问页面:</span>
+                        <span id="current-page" class="text-gray-800 text-sm break-all">加载中...</span>
+                    </div>
+                    <div class="flex justify-between border-b pb-2">
+                        <span class="text-gray-600 font-medium">来源页面:</span>
+                        <span id="referrer" class="text-gray-800 text-sm break-all">加载中...</span>
+                    </div>
+                    <div class="flex flex-col border-b pb-2">
+                        <span class="text-gray-600 font-medium mb-1">User Agent:</span>
+                        <span id="user-agent" class="text-gray-800 text-xs break-all">加载中...</span>
+                    </div>
+                    <div class="flex justify-between border-b pb-2">
+                        <span class="text-gray-600 font-medium">硬件并发数:</span>
+                        <span id="hardware-concurrency" class="text-gray-800">加载中...</span>
+                    </div>
+                    <div class="flex justify-between border-b pb-2">
+                        <span class="text-gray-600 font-medium">设备内存:</span>
+                        <span id="device-memory" class="text-gray-800">加载中...</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600 font-medium">触摸支持:</span>
+                        <span id="touch-support" class="text-gray-800">加载中...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6 mt-6">
+                <div class="info-card bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-semibold text-teal-600 mb-4 flex items-center">
+                        <span class="mr-2">🖥️</span> 显示信息
+                    </h2>
+                    <div class="space-y-3">
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">可用宽度:</span>
+                            <span id="avail-width" class="text-gray-800 font-mono">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">可用高度:</span>
+                            <span id="avail-height" class="text-gray-800 font-mono">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">窗口宽度:</span>
+                            <span id="window-width" class="text-gray-800 font-mono">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">窗口高度:</span>
+                            <span id="window-height" class="text-gray-800 font-mono">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">屏幕方向:</span>
+                            <span id="orientation" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600 font-medium">最大触摸点:</span>
+                            <span id="max-touch-points" class="text-gray-800">加载中...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-semibold text-cyan-600 mb-4 flex items-center">
+                        <span class="mr-2">🎨</span> Canvas指纹
+                    </h2>
+                    <div class="space-y-3">
+                        <div class="flex flex-col border-b pb-2">
+                            <span class="text-gray-600 font-medium mb-1">Canvas哈希:</span>
+                            <span id="canvas-fingerprint" class="text-gray-800 text-xs font-mono break-all">加载中...</span>
+                        </div>
+                        <div class="flex flex-col border-b pb-2">
+                            <span class="text-gray-600 font-medium mb-1">WebGL渲染器:</span>
+                            <span id="webgl-renderer" class="text-gray-800 text-xs break-all">加载中...</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-gray-600 font-medium mb-1">WebGL供应商:</span>
+                            <span id="webgl-vendor" class="text-gray-800 text-xs break-all">加载中...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-semibold text-amber-600 mb-4 flex items-center">
+                        <span class="mr-2">🔊</span> 媒体设备
+                    </h2>
+                    <div class="space-y-3">
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">音频输入:</span>
+                            <span id="audio-input" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">音频输出:</span>
+                            <span id="audio-output" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">视频输入:</span>
+                            <span id="video-input" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600 font-medium">媒体权限:</span>
+                            <span id="media-permission" class="text-gray-800">加载中...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-semibold text-lime-600 mb-4 flex items-center">
+                        <span class="mr-2">🔐</span> 权限与功能
+                    </h2>
+                    <div class="space-y-3">
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">Do Not Track:</span>
+                            <span id="dnt" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">Java启用:</span>
+                            <span id="java-enabled" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">PDF查看器:</span>
+                            <span id="pdf-viewer" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">本地存储:</span>
+                            <span id="local-storage" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">会话存储:</span>
+                            <span id="session-storage" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600 font-medium">IndexedDB:</span>
+                            <span id="indexed-db" class="text-gray-800">加载中...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-semibold text-violet-600 mb-4 flex items-center">
+                        <span class="mr-2">⏰</span> 时间信息
+                    </h2>
+                    <div class="space-y-3">
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">时区偏移:</span>
+                            <span id="timezone-offset" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">时区名称:</span>
+                            <span id="timezone-name" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">系统语言:</span>
+                            <span id="system-language" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600 font-medium">所有语言:</span>
+                            <span id="all-languages" class="text-gray-800 text-sm">加载中...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-semibold text-rose-600 mb-4 flex items-center">
+                        <span class="mr-2">🎯</span> 浏览器特性
+                    </h2>
+                    <div class="space-y-3">
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">WebRTC:</span>
+                            <span id="webrtc" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">WebGL:</span>
+                            <span id="webgl" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">WebAssembly:</span>
+                            <span id="webassembly" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">Service Worker:</span>
+                            <span id="service-worker" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">通知API:</span>
+                            <span id="notification" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600 font-medium">剪贴板API:</span>
+                            <span id="clipboard" class="text-gray-800">加载中...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-card bg-white p-6 rounded-xl shadow-lg mt-6">
+                <h2 class="text-2xl font-semibold text-gray-700 mb-4 flex items-center">
+                    <span class="mr-2">🔢</span> 已安装字体检测
+                </h2>
+                <div class="space-y-3">
+                    <div class="flex flex-col">
+                        <span class="text-gray-600 font-medium mb-2">检测到的字体:</span>
+                        <div id="fonts-list" class="text-gray-800 text-sm flex flex-wrap gap-2">加载中...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-card bg-white p-6 rounded-xl shadow-lg mt-6">
+                <h2 class="text-2xl font-semibold text-gray-700 mb-4 flex items-center">
+                    <span class="mr-2">🔌</span> 浏览器插件
+                </h2>
+                <div class="space-y-3">
+                    <div class="flex flex-col">
+                        <span class="text-gray-600 font-medium mb-2">检测到的插件:</span>
+                        <div id="plugins-list" class="text-gray-800 text-sm">加载中...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 text-center">
+                <button id="refresh-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-3 rounded-lg shadow-lg transition duration-300 transform hover:scale-105">
+                    🔄 刷新信息
+                </button>
+            </div>
+        </div>
+
+        <footer class="mt-12 text-center text-gray-600 text-sm">
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded">
+                <p class="text-yellow-800 font-semibold mb-2">⚠️ 隐私警告</p>
+                <p class="text-yellow-700 text-sm">以上所有信息都可以在您访问任何网站时被收集，无需您的明确授权。这些数据可以用于创建您的数字指纹，追踪您的在线活动。</p>
+            </div>
+            <p>© 2025 访问者信息监测系统 | 所有信息仅在本地浏览器中处理</p>
+            <p class="mt-2 text-gray-500">Created by <a href="" target="_blank" class="text-blue-500 hover:text-blue-600 font-medium">@JavierK</a></p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
