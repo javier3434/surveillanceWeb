@@ -73,23 +73,18 @@ function detectDeviceType() {
 async function getIPInfo() {
     const apis = [
         {
-            url: 'https://api.ipify.org?format=json',
-            parser: async (data) => {
-                const ip = data.ip;
-                const geoResponse = await fetch(`http://ip-api.com/json/${ip}?lang=zh-CN`);
-                const geoData = await geoResponse.json();
-                return {
-                    ip: ip,
-                    isp: geoData.isp || '无法获取',
-                    country: geoData.country || '无法获取',
-                    region: geoData.regionName || '无法获取',
-                    city: geoData.city || '无法获取',
-                    latitude: geoData.lat || '无法获取',
-                    longitude: geoData.lon || '无法获取',
-                    timezone: geoData.timezone || '无法获取',
-                    postal: geoData.zip || '无法获取'
-                };
-            }
+            url: 'https://ipwho.is/',
+            parser: async (data) => ({
+                ip: data.ip,
+                isp: data.connection?.isp || '无法获取',
+                country: data.country,
+                region: data.region,
+                city: data.city,
+                latitude: data.latitude,
+                longitude: data.longitude,
+                timezone: data.timezone?.id || '无法获取',
+                postal: data.postal || '无法获取'
+            })
         },
         {
             url: 'https://ipapi.co/json/',
@@ -106,17 +101,31 @@ async function getIPInfo() {
             })
         },
         {
-            url: 'https://ipwho.is/',
+            url: 'https://api.ipgeolocation.io/ipgeo?apiKey=free',
             parser: async (data) => ({
                 ip: data.ip,
-                isp: data.connection?.isp || '无法获取',
-                country: data.country,
-                region: data.region,
+                isp: data.isp || '无法获取',
+                country: data.country_name,
+                region: data.state_prov,
                 city: data.city,
                 latitude: data.latitude,
                 longitude: data.longitude,
-                timezone: data.timezone?.id || '无法获取',
-                postal: data.postal || '无法获取'
+                timezone: data.time_zone?.name || '无法获取',
+                postal: data.zipcode || '无法获取'
+            })
+        },
+        {
+            url: 'https://freeipapi.com/api/json',
+            parser: async (data) => ({
+                ip: data.ipAddress,
+                isp: '无法获取',
+                country: data.countryName,
+                region: data.regionName,
+                city: data.cityName,
+                latitude: data.latitude,
+                longitude: data.longitude,
+                timezone: data.timeZone || '无法获取',
+                postal: data.zipCode || '无法获取'
             })
         }
     ];
