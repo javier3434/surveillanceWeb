@@ -465,6 +465,321 @@ function getPlugins() {
     }
 }
 
+function getPerformanceInfo() {
+    if (window.performance && window.performance.timing) {
+        const timing = window.performance.timing;
+        const loadTime = timing.loadEventEnd - timing.navigationStart;
+        const dnsTime = timing.domainLookupEnd - timing.domainLookupStart;
+        const tcpTime = timing.connectEnd - timing.connectStart;
+        const ttfb = timing.responseStart - timing.navigationStart;
+        
+        document.getElementById('page-load-time').textContent = loadTime > 0 ? `${loadTime} ms` : '计算中...';
+        document.getElementById('dns-time').textContent = dnsTime > 0 ? `${dnsTime} ms` : '无法获取';
+        document.getElementById('tcp-time').textContent = tcpTime > 0 ? `${tcpTime} ms` : '无法获取';
+        document.getElementById('ttfb').textContent = ttfb > 0 ? `${ttfb} ms` : '计算中...';
+    } else {
+        document.getElementById('page-load-time').textContent = '不支持';
+        document.getElementById('dns-time').textContent = '不支持';
+        document.getElementById('tcp-time').textContent = '不支持';
+        document.getElementById('ttfb').textContent = '不支持';
+    }
+}
+
+let clickCount = 0;
+let keyCount = 0;
+let scrollDistance = 0;
+
+function trackUserBehavior() {
+    document.addEventListener('mousemove', (e) => {
+        document.getElementById('mouse-position').textContent = `X: ${e.clientX}, Y: ${e.clientY}`;
+    });
+    
+    document.addEventListener('click', () => {
+        clickCount++;
+        document.getElementById('click-count').textContent = clickCount;
+    });
+    
+    document.addEventListener('keydown', () => {
+        keyCount++;
+        document.getElementById('key-count').textContent = keyCount;
+    });
+    
+    let lastScrollTop = 0;
+    window.addEventListener('scroll', () => {
+        const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+        scrollDistance += Math.abs(currentScroll - lastScrollTop);
+        lastScrollTop = currentScroll;
+        document.getElementById('scroll-distance').textContent = `${Math.round(scrollDistance)} px`;
+    });
+}
+
+function getAudioFingerprint() {
+    try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) {
+            document.getElementById('audio-fingerprint').textContent = '不支持';
+            document.getElementById('audio-api').textContent = '不支持';
+            return;
+        }
+        
+        const context = new AudioContext();
+        const oscillator = context.createOscillator();
+        const analyser = context.createAnalyser();
+        const gainNode = context.createGain();
+        const scriptProcessor = context.createScriptProcessor(4096, 1, 1);
+        
+        gainNode.gain.value = 0;
+        oscillator.type = 'triangle';
+        oscillator.connect(analyser);
+        analyser.connect(scriptProcessor);
+        scriptProcessor.connect(gainNode);
+        gainNode.connect(context.destination);
+        
+        scriptProcessor.onaudioprocess = function(event) {
+            const output = event.outputBuffer.getChannelData(0);
+            let hash = 0;
+            for (let i = 0; i < output.length; i++) {
+                hash += Math.abs(output[i]);
+            }
+            document.getElementById('audio-fingerprint').textContent = hash.toFixed(10);
+            oscillator.disconnect();
+            scriptProcessor.disconnect();
+        };
+        
+        oscillator.start(0);
+        document.getElementById('audio-api').textContent = '支持';
+        
+        setTimeout(() => {
+            oscillator.stop();
+        }, 100);
+    } catch (error) {
+        document.getElementById('audio-fingerprint').textContent = '获取失败';
+        document.getElementById('audio-api').textContent = '获取失败';
+    }
+}
+
+function getLocalIPs() {
+    const ips = [];
+    const ipv6s = [];
+    
+    if (!window.RTCPeerConnection) {
+        document.getElementById('local-ips').textContent = 'WebRTC不支持';
+        document.getElementById('ipv6-address').textContent = 'WebRTC不支持';
+        return;
+    }
+    
+    const pc = new RTCPeerConnection({iceServers: []});
+    pc.createDataChannel('');
+    
+    pc.createOffer().then(offer => pc.setLocalDescription(offer));
+    
+    pc.onicecandidate = (ice) => {
+        if (!ice || !ice.candidate || !ice.candidate.candidate) {
+            if (ips.length === 0) {
+                document.getElementById('local-ips').textContent = '无法获取';
+            }
+            if (ipv6s.length === 0) {
+                document.getElementById('ipv6-address').textContent = '无';
+            }
+            return;
+        }
+        
+        const parts = ice.candidate.candidate.split(' ');
+        const ip = parts[4];
+        
+        if (ip && ip !== '0.0.0.0') {
+            if (ip.includes(':')) {
+                if (!ipv6s.includes(ip)) {
+                    ipv6s.push(ip);
+                    document.getElementById('ipv6-address').textContent = ipv6s.join(', ');
+                }
+            } else {
+                if (!ips.includes(ip)) {
+                    ips.push(ip);
+                    document.getElementById('local-ips').textContent = ips.join(', ');
+                }
+            }
+        }
+    };
+    
+    setTimeout(() => {
+        pc.close();
+    }, 2000);
+}
+
+function detectAdBlocker() {
+    const testAd = document.createElement('div');
+    testAd.innerHTML = '&nbsp;';
+    testAd.className = 'adsbox ad-banner';
+    testAd.style.position = 'absolute';
+    testAd.style.left = '-9999px';
+    document.body.appendChild(testAd);
+    
+    setTimeout(() => {
+        const isBlocked = testAd.offsetHeight === 0;
+        document.getElementById('ad-blocker').textContent = isBlocked ? '已检测到' : '未检测到';
+        document.body.removeChild(testAd);
+    }, 100);
+}
+
+function detectPrivateMode() {
+    try {
+        localStorage.setItem('test', '1');
+        localStorage.removeItem('test');
+        document.getElementById('private-mode').textContent = '否';
+    } catch (e) {
+        document.getElementById('private-mode').textContent = '可能是';
+    }
+}
+
+function detectAutomation() {
+    const indicators = [];
+    
+    if (navigator.webdriver) indicators.push('webdriver');
+    if (window.callPhantom || window._phantom) indicators.push('PhantomJS');
+    if (window.__nightmare) indicators.push('Nightmare');
+    if (window.Buffer) indicators.push('Node.js');
+    if (window.emit) indicators.push('CouchJS');
+    if (window.spawn) indicators.push('Rhino');
+    
+    document.getElementById('automation').textContent = indicators.length > 0 ? indicators.join(', ') : '未检测到';
+}
+
+async function getStorageQuota() {
+    if (navigator.storage && navigator.storage.estimate) {
+        try {
+            const estimate = await navigator.storage.estimate();
+            const quota = (estimate.quota / 1024 / 1024 / 1024).toFixed(2);
+            const usage = (estimate.usage / 1024 / 1024).toFixed(2);
+            
+            document.getElementById('storage-quota').textContent = `${quota} GB`;
+            document.getElementById('storage-usage').textContent = `${usage} MB`;
+            
+            if (navigator.storage.persisted) {
+                const persisted = await navigator.storage.persisted();
+                document.getElementById('persistent-storage').textContent = persisted ? '已启用' : '未启用';
+            } else {
+                document.getElementById('persistent-storage').textContent = '不支持';
+            }
+        } catch (error) {
+            document.getElementById('storage-quota').textContent = '获取失败';
+            document.getElementById('storage-usage').textContent = '获取失败';
+            document.getElementById('persistent-storage').textContent = '获取失败';
+        }
+    } else {
+        document.getElementById('storage-quota').textContent = '不支持';
+        document.getElementById('storage-usage').textContent = '不支持';
+        document.getElementById('persistent-storage').textContent = '不支持';
+    }
+}
+
+let pageLoadTime = Date.now();
+let lastActivityTime = Date.now();
+let activeTime = 0;
+let isPageActive = true;
+let leaveCount = 0;
+let lastPauseTime = 0;
+let totalAwayTime = 0;
+let currentSessionAwayStart = 0;
+let timerInterval = null;
+
+function formatTime(seconds) {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    
+    if (hours > 0) {
+        return `${hours}时${minutes}分${secs}秒`;
+    } else if (minutes > 0) {
+        return `${minutes}分${secs}秒`;
+    } else {
+        return `${secs} 秒`;
+    }
+}
+
+function trackPageActivity() {
+    timerInterval = setInterval(() => {
+        if (isPageActive) {
+            activeTime++;
+            document.getElementById('time-on-page').textContent = formatTime(activeTime);
+        } else {
+            const currentSessionAway = Math.floor((Date.now() - currentSessionAwayStart) / 1000);
+            const displayAwayTime = totalAwayTime + currentSessionAway;
+            document.getElementById('away-time').textContent = formatTime(displayAwayTime);
+        }
+        
+        const timeSinceActivity = Math.floor((Date.now() - lastActivityTime) / 1000);
+        if (timeSinceActivity < 5) {
+            document.getElementById('last-activity').textContent = '刚刚';
+        } else if (timeSinceActivity < 60) {
+            document.getElementById('last-activity').textContent = `${timeSinceActivity} 秒前`;
+        } else {
+            document.getElementById('last-activity').textContent = `${Math.floor(timeSinceActivity / 60)} 分钟前`;
+        }
+    }, 1000);
+    
+    ['mousemove', 'keydown', 'scroll', 'click'].forEach(event => {
+        document.addEventListener(event, () => {
+            lastActivityTime = Date.now();
+        });
+    });
+    
+    function handleVisibilityChange() {
+        if (document.hidden) {
+            isPageActive = false;
+            currentSessionAwayStart = Date.now();
+            lastPauseTime = Date.now();
+            document.getElementById('page-visibility').textContent = '隐藏';
+        } else {
+            if (!isPageActive) {
+                const sessionAwayDuration = Math.floor((Date.now() - currentSessionAwayStart) / 1000);
+                totalAwayTime += sessionAwayDuration;
+                leaveCount++;
+                document.getElementById('leave-count').textContent = leaveCount;
+                document.getElementById('away-time').textContent = formatTime(totalAwayTime);
+                showWelcomeBack();
+            }
+            isPageActive = true;
+            document.getElementById('page-visibility').textContent = '可见';
+        }
+    }
+    
+    function handleBlur() {
+        isPageActive = false;
+        currentSessionAwayStart = Date.now();
+        lastPauseTime = Date.now();
+        document.getElementById('focus-status').textContent = '失去焦点';
+    }
+    
+    function handleFocus() {
+        if (!isPageActive) {
+            const sessionAwayDuration = Math.floor((Date.now() - currentSessionAwayStart) / 1000);
+            totalAwayTime += sessionAwayDuration;
+            leaveCount++;
+            document.getElementById('leave-count').textContent = leaveCount;
+            document.getElementById('away-time').textContent = formatTime(totalAwayTime);
+            showWelcomeBack();
+        }
+        isPageActive = true;
+        document.getElementById('focus-status').textContent = '有焦点';
+    }
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('blur', handleBlur);
+    window.addEventListener('focus', handleFocus);
+}
+
+function showWelcomeBack() {
+    const welcomeBackEl = document.getElementById('welcome-back');
+    welcomeBackEl.classList.remove('hidden');
+    welcomeBackEl.classList.add('flex');
+    
+    setTimeout(() => {
+        welcomeBackEl.classList.add('hidden');
+        welcomeBackEl.classList.remove('flex');
+    }, 3000);
+}
+
 function updateCurrentTime() {
     document.getElementById('current-time').textContent = new Date().toLocaleString('zh-CN');
 }
@@ -486,12 +801,25 @@ function loadAllInfo() {
     getBrowserFeatures();
     detectFonts();
     getPlugins();
+    getPerformanceInfo();
+    getAudioFingerprint();
+    getLocalIPs();
+    detectAdBlocker();
+    detectPrivateMode();
+    detectAutomation();
+    getStorageQuota();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     loadAllInfo();
+    trackUserBehavior();
+    trackPageActivity();
     
     setInterval(updateCurrentTime, 1000);
+    
+    setTimeout(() => {
+        getPerformanceInfo();
+    }, 1000);
     
     document.getElementById('refresh-btn').addEventListener('click', () => {
         document.querySelectorAll('.loading').forEach(el => {

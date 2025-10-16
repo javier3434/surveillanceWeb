@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,19 +10,147 @@
         .info-card {
             transition: transform 0.2s;
         }
+
         .info-card:hover {
             transform: translateY(-2px);
         }
+
         .loading {
             animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
+
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: .5; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: .5;
+            }
+        }
+
+        .fixed-tracker {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tracker-spacer {
+            visibility: hidden;
+            pointer-events: none;
         }
     </style>
 </head>
+
 <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div class="tracker-spacer">
+        <div class="container mx-auto px-4 py-2">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <span class="text-xl">🖱️</span>
+                    <span class="font-semibold text-gray-700 text-sm">实时追踪</span>
+                    <p class="text-xs text-gray-500 hidden lg:block">Created by <a href="" target="_blank"
+                            class="text-blue-500 hover:text-blue-600 font-medium">@JavierK</a></p>
+                </div>
+                <div class="flex flex-wrap gap-3 text-xs lg:text-sm">
+                    <div class="flex items-center gap-1">
+                        <span class="text-gray-600">鼠标:</span>
+                        <span class="font-mono text-gray-800 bg-gray-100 px-1.5 py-0.5 rounded text-xs">占位</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="text-gray-600">点击:</span>
+                        <span class="font-mono text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded font-semibold">0</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="text-gray-600">按键:</span>
+                        <span class="font-mono text-green-600 bg-green-50 px-1.5 py-0.5 rounded font-semibold">0</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="text-gray-600">滚动:</span>
+                        <span class="font-mono text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded font-semibold">0 px</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="text-gray-600">活跃:</span>
+                        <span class="font-mono text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded font-semibold">0 秒</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="text-gray-600">离开:</span>
+                        <span class="font-mono text-red-600 bg-red-50 px-1.5 py-0.5 rounded font-semibold">0</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="text-gray-600">累计离开:</span>
+                        <span class="font-mono text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded font-semibold">0 秒</span>
+                    </div>
+                    <div class="flex items-center gap-1 animate-bounce">
+                        <span class="text-green-600 font-semibold text-sm">👋 你回来啦！</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="fixed-tracker">
+        <div class="container mx-auto px-4 py-2">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <span class="text-xl">🖱️</span>
+                    <span class="font-semibold text-gray-700 text-sm">实时追踪</span>
+                    <p class="text-xs text-gray-500 hidden lg:block">Created by <a href="" target="_blank"
+                            class="text-blue-500 hover:text-blue-600 font-medium">@JavierK</a></p>
+                </div>
+                <div class="flex flex-wrap gap-3 text-xs lg:text-sm">
+                    <div class="flex items-center gap-1">
+                        <span class="text-gray-600">鼠标:</span>
+                        <span id="mouse-position"
+                            class="font-mono text-gray-800 bg-gray-100 px-1.5 py-0.5 rounded text-xs">等待移动...</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="text-gray-600">点击:</span>
+                        <span id="click-count"
+                            class="font-mono text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded font-semibold">0</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="text-gray-600">按键:</span>
+                        <span id="key-count"
+                            class="font-mono text-green-600 bg-green-50 px-1.5 py-0.5 rounded font-semibold">0</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="text-gray-600">滚动:</span>
+                        <span id="scroll-distance"
+                            class="font-mono text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded font-semibold">0
+                            px</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="text-gray-600">活跃:</span>
+                        <span id="time-on-page"
+                            class="font-mono text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded font-semibold">0
+                            秒</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="text-gray-600">离开:</span>
+                        <span id="leave-count"
+                            class="font-mono text-red-600 bg-red-50 px-1.5 py-0.5 rounded font-semibold">0</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="text-gray-600">累计离开:</span>
+                        <span id="away-time"
+                            class="font-mono text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded font-semibold">0 秒</span>
+                    </div>
+                    <div id="welcome-back" class="hidden items-center gap-1 animate-bounce">
+                        <span class="text-green-600 font-semibold text-sm">👋 你回来啦！</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="container mx-auto px-4 py-8">
         <header class="text-center mb-8">
             <h1 class="text-4xl font-bold text-gray-800 mb-2">🌐 访问者信息监测系统</h1>
@@ -279,7 +408,8 @@
                     <div class="space-y-3">
                         <div class="flex flex-col border-b pb-2">
                             <span class="text-gray-600 font-medium mb-1">Canvas哈希:</span>
-                            <span id="canvas-fingerprint" class="text-gray-800 text-xs font-mono break-all">加载中...</span>
+                            <span id="canvas-fingerprint"
+                                class="text-gray-800 text-xs font-mono break-all">加载中...</span>
                         </div>
                         <div class="flex flex-col border-b pb-2">
                             <span class="text-gray-600 font-medium mb-1">WebGL渲染器:</span>
@@ -429,8 +559,127 @@
                 </div>
             </div>
 
+            <div class="grid md:grid-cols-2 gap-6 mt-6">
+                <div class="info-card bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-semibold text-emerald-600 mb-4 flex items-center">
+                        <span class="mr-2">🎮</span> 性能信息
+                    </h2>
+                    <div class="space-y-3">
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">页面加载时间:</span>
+                            <span id="page-load-time" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">DNS查询时间:</span>
+                            <span id="dns-time" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">TCP连接时间:</span>
+                            <span id="tcp-time" class="text-gray-800">加载中...</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600 font-medium">首字节时间:</span>
+                            <span id="ttfb" class="text-gray-800">加载中...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-semibold text-sky-600 mb-4 flex items-center">
+                        <span class="mr-2">📊</span> 音频指纹
+                    </h2>
+                    <div class="space-y-3">
+                        <div class="flex flex-col border-b pb-2">
+                            <span class="text-gray-600 font-medium mb-1">AudioContext哈希:</span>
+                            <span id="audio-fingerprint" class="text-gray-800 text-xs font-mono break-all">加载中...</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600 font-medium">音频API:</span>
+                            <span id="audio-api" class="text-gray-800">加载中...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-semibold text-orange-600 mb-4 flex items-center">
+                        <span class="mr-2">🌐</span> WebRTC本地IP
+                    </h2>
+                    <div class="space-y-3">
+                        <div class="flex flex-col border-b pb-2">
+                            <span class="text-gray-600 font-medium mb-1">本地IP地址:</span>
+                            <span id="local-ips" class="text-gray-800 text-sm font-mono">检测中...</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600 font-medium">IPv6地址:</span>
+                            <span id="ipv6-address" class="text-gray-800 text-xs font-mono">检测中...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-semibold text-red-600 mb-4 flex items-center">
+                        <span class="mr-2">🔍</span> 广告拦截检测
+                    </h2>
+                    <div class="space-y-3">
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">广告拦截器:</span>
+                            <span id="ad-blocker" class="text-gray-800">检测中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">隐私模式:</span>
+                            <span id="private-mode" class="text-gray-800">检测中...</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600 font-medium">自动化工具:</span>
+                            <span id="automation" class="text-gray-800">检测中...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-semibold text-purple-600 mb-4 flex items-center">
+                        <span class="mr-2">💾</span> 存储配额
+                    </h2>
+                    <div class="space-y-3">
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">可用存储:</span>
+                            <span id="storage-quota" class="text-gray-800">检测中...</span>
+                        </div>
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="text-gray-600 font-medium">已用存储:</span>
+                            <span id="storage-usage" class="text-gray-800">检测中...</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600 font-medium">持久化存储:</span>
+                            <span id="persistent-storage" class="text-gray-800">检测中...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-card bg-white p-6 rounded-xl shadow-lg mt-6">
+                <h2 class="text-2xl font-semibold text-gray-700 mb-4 flex items-center">
+                    <span class="mr-2">🎯</span> 页面状态追踪
+                </h2>
+                <div class="space-y-3">
+                    <div class="flex justify-between border-b pb-2">
+                        <span class="text-gray-600 font-medium">页面可见状态:</span>
+                        <span id="page-visibility" class="text-gray-800">可见</span>
+                    </div>
+                    <div class="flex justify-between border-b pb-2">
+                        <span class="text-gray-600 font-medium">窗口焦点状态:</span>
+                        <span id="focus-status" class="text-gray-800">有焦点</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600 font-medium">最后活动时间:</span>
+                        <span id="last-activity" class="text-gray-800">刚刚</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="mt-8 text-center">
-                <button id="refresh-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-3 rounded-lg shadow-lg transition duration-300 transform hover:scale-105">
+                <button id="refresh-btn"
+                    class="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-3 rounded-lg shadow-lg transition duration-300 transform hover:scale-105">
                     🔄 刷新信息
                 </button>
             </div>
@@ -442,10 +691,12 @@
                 <p class="text-yellow-700 text-sm">以上所有信息都可以在您访问任何网站时被收集，无需您的明确授权。这些数据可以用于创建您的数字指纹，追踪您的在线活动。</p>
             </div>
             <p>© 2025 访问者信息监测系统 | 所有信息仅在本地浏览器中处理</p>
-            <p class="mt-2 text-gray-500">Created by <a href="" target="_blank" class="text-blue-500 hover:text-blue-600 font-medium">@JavierK</a></p>
+            <p class="mt-2 text-gray-500">Created by <a href="" target="_blank"
+                    class="text-blue-500 hover:text-blue-600 font-medium">@JavierK</a></p>
         </footer>
     </div>
 
     <script src="app.js"></script>
 </body>
+
 </html>
